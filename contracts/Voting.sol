@@ -6,10 +6,9 @@ import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 // Allows pausing of voting via pausable 
-// Also allows contextual information
+// Also allows contextual information via inheritance
 // Allows ownership through ownable
 contract Voting is Ownable, Pausable  {
-
     // The default number of voters which is 0
     uint votersCount  = 0;
 
@@ -18,7 +17,6 @@ contract Voting is Ownable, Pausable  {
     // Enum to hold the value of voted or not voted.
     enum Response{NO, YES}
 
-
     // Struct to store information about voters
     struct Voter {
         string name;
@@ -26,7 +24,6 @@ contract Voting is Ownable, Pausable  {
         Response hasVoted;
         Response registered;
     }
-
 
     constructor() {
         // pause voting until ready
