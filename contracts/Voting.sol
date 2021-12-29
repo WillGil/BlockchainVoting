@@ -16,60 +16,62 @@ contract Voting is Ownable, Pausable  {
     mapping(address => Voter) voters;
 
     // Enum to hold the value of voted or not voted.
-    enum Voted{NO, YES}
+    enum Response{NO, YES}
+
 
     // Struct to store information about voters
     struct Voter {
         string name;
-        bool response;
-        Voted hasVoted;
-        bool registered;
+        Response response;
+        Response hasVoted;
+        Response registered;
     }
 
 
-    constructor() {}
+    constructor() {
+        // pause voting until ready
+        _pause();
+    }
 
     modifier NotRegisteredToVote(){
-        require(voters[_msgSender()].registered == false, "Voting: You're already registered to vote"); 
+        require(voters[_msgSender()].registered == Response.NO, "Voting: You are already registered to vote"); 
         _;
     }
     modifier registeredToVote(){
-        require(voters[_msgSender()].registered == true, "Voting: You're not registered to vote" );
+        require(voters[_msgSender()].registered == Response.YES, "Voting: You are not registered to vote" );
         _;
     }
 
-    modifier voteCasted(){
-        require(voters[_msgSender()].hasVoted == Voted.YES, "Voting: You haven't casted your vote.");
+    modifier voteCast(){
+        require(voters[_msgSender()].hasVoted == Response.YES, "Voting: You have not casted your vote.");
         _;
     }
 
-    modifier voteNotCasted(){
-        require(voters[_msgSender()].hasVoted == Voted.NO, "Voting: You have casted your vote." )
+    modifier voteNotCast(){
+        require(voters[_msgSender()].hasVoted == Response.NO, "Voting: You have casted your vote." );
+        _;
     }
 
-    // Voter can be added to the smart contract (But only when it's not voting time)
-    function addVoter(string memory name) external whenPaused NotRegisteredToVote{
-        address addressToAdd = _msgSender();
-        voters[addressToAdd] = Voter(name, Voted.NO, false, true);
-        votersCount++;
-    }
-
-    // Only the owner can start the voting session
-    function startVote() public onlyOwner {
-        //  Unpause using the pausable 
+    function startVote() external onlyOwner{
         _unpause();
     }
 
-    function endVote() public onlyOwner {
-        // Pause the voting session again using pausable
+    function endVote() external onlyOwner{
         _pause();
     }
-   
+    // Voter can be added to the smart contract (But only when it's not voting time)
+    function addVoter(string memory name) external whenPaused NotRegisteredToVote{
+        address addressToAdd = _msgSender();
+        voters[addressToAdd] = Voter(name, Response.NO, Response.NO, Response.YES);
+        votersCount++;
+    }
+
+
     // Votes can be cast when the voting session is not paused.
-    function vote(bool _response) external whenNotPaused registeredToVote voteNotCasted {
+    function vote(bool _response) external whenNotPaused registeredToVote voteNotCast {
         //Update struct values
         Voter storage voter = voters[_msgSender()];
-        voter.response = _response; 
+        voter.response = (_response == true ? Response.YES : Response.NO ); 
 
     }    
   
