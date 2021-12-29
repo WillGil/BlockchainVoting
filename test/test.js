@@ -1,9 +1,13 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-
 let Voting;
 let voting;
+let owner;
+let addr1;
+let addr2;
+let addrs;
+
 
 describe("Voting", function(){
   // `beforeEach` will run before each test, re-deploying the contract every
@@ -23,17 +27,24 @@ describe("Voting", function(){
 
 
     it("Check no one has casted as vote.", async function () {
+
+      // destructuring assignment
+      let [usersRegistered, usersVoted] = await voting.getUsers();
+
+      expect(usersRegistered.length).to.equal(0);
+      expect(usersVoted.length).to.equal(0);
     
-      // Check there are no users who have cast their vote 
-      expect((await voting.getNumberOfVoters())).to.equal(0)
     });
   })
   describe("Adding users", function () {
 
     it("Adding users normally.", async function () {
-      const addedUserTx = await voting.addVoter("Test");
+      await voting.addVoter("Test");
 
-      expect((await voting.getNumberOfVoters())).to.equal(1)
+      let [usersRegistered, ] = await voting.getUsers();
+
+
+      expect(usersRegistered.length).to.equal(1)
 
     });
     it("Adding users when not paused.", async function () {
@@ -49,6 +60,16 @@ describe("Voting", function(){
       await expect(secondUserTx).to.be.revertedWith("Voting: You are already registered to vote"); 
     });
 
+  });
+  describe("Voting", function () {
+
+    it("User can vote.", async function(){
+
+      // Unpause the voting.
+      
+      const addedUser = await voting.addVoter("Test");
+      const voteTx = await voting.vote(true);
+    })
   });
 
 });
