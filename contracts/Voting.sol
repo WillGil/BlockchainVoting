@@ -5,23 +5,49 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-// Allows pausing of voting via pausable
-// Also allows contextual information via inheritance
-// Allows ownership through ownable
+/**
+ * @dev Voting contract which allows on-chain voting for blockchain users.
+ *
+ * Allows pausing of voting via pausable
+ * Also allows contextual information via inheritance
+ * Allows ownership through ownable
+ */
+
 contract Voting is Ownable, Pausable {
-    // Solidity generates getters for public variables
+    /**
+     * @dev added the arrays to hold the addresses of users who have
+     * interacted with the functions.
+     */
     address[] public registeredVoters;
     address[] public voteCasters;
 
+    /**
+     * @dev a map that has a one to one realtionship between
+     * addresses and voters.
+     */
     mapping(address => Voter) voters;
 
-    // Enum to hold the value of voted or not voted.
+    /**
+     * @dev a enum that holds responses that the user can give.
+     */
     enum Response {
         NO,
         YES
     }
 
-    // Struct to store information about voters
+    /**
+     * @dev When a user casts a vote we want to emit that to the network
+     */
+    event Vote(address indexed _address, bool response);
+
+    /**
+     * @dev When a user connects to cast a vote we want to emit that to the blockchain
+     */
+    event Register(address indexed _address);
+
+    /**
+     * @dev Voter struct allows us to represent every voter and their information.
+     */
     struct Voter {
         string name;
         Response response;
@@ -29,11 +55,21 @@ contract Voting is Ownable, Pausable {
         bool castVote;
     }
 
+    /**
+     * @dev Initalises the code in the paused state, not ready for voting.
+     */
     constructor() {
         // pause voting until ready
         _pause();
     }
 
+    /**
+     * @dev Modifier to make a function callable only when the user is not registered to vote.
+     *
+     * Requirements:
+     *
+     * - The user must be not already registered to vote
+     */
     modifier NotRegisteredToVote() {
         require(
             voters[_msgSender()].init == false,
@@ -41,6 +77,14 @@ contract Voting is Ownable, Pausable {
         );
         _;
     }
+
+    /**
+     * @dev Modifier to make a function callable only when the user is registered to vote.
+     *
+     * Requirements:
+     *
+     * - The user must be already registered to vote
+     */
     modifier registeredToVote() {
         require(
             voters[_msgSender()].init == true,
@@ -49,6 +93,13 @@ contract Voting is Ownable, Pausable {
         _;
     }
 
+    /**
+     * @dev Modifier to make a function callable only when the user has cast their vote
+     *
+     * Requirements:
+     *
+     * - The user must have already voted.
+     */
     modifier voteCast() {
         require(
             voters[_msgSender()].castVote == true,
@@ -57,6 +108,13 @@ contract Voting is Ownable, Pausable {
         _;
     }
 
+    /**
+     * @dev Modifier to make a function callable only when the user has not cast their vote
+     *
+     * Requirements:
+     *
+     * - The user must have not already voted.
+     */
     modifier voteNotCast() {
         require(
             voters[_msgSender()].castVote == false,
@@ -65,15 +123,27 @@ contract Voting is Ownable, Pausable {
         _;
     }
 
+    /**
+     * @dev function to start the voting session, only the owner can call this.
+     */
     function startVote() external onlyOwner {
         _unpause();
     }
 
+    /**
+     * @dev function to end the voting session, only the owner can call this.
+     */
     function endVote() external onlyOwner {
         _pause();
     }
 
-    // Voter can be added to the smart contract (But only when it's not voting time)
+    /**
+     * @dev function to add a voter to the voting session, can be called by the user
+     * (simimilar to an approve function before a tx occurs.)
+     * @param _name The voters name.
+     *
+     * Emits a {Register} event.
+     */
     function addVoter(string memory _name)
         external
         whenPaused
@@ -83,9 +153,17 @@ contract Voting is Ownable, Pausable {
         voters[newVoter] = Voter(_name, Response.NO, true, false);
         // Add a new voter to the list of registered voters
         registeredVoters.push(newVoter);
+
+        emit Register(newVoter);
     }
 
-    // Votes can be cast when the voting session is not paused.
+    /**
+     * @dev function to cast a vote on the session, user must be registered to
+     * invoke this function.
+     * @param _response The voters answer.
+     *
+     * Emits a {Vote} event.
+     */
     function vote(bool _response)
         external
         whenNotPaused
@@ -97,8 +175,13 @@ contract Voting is Ownable, Pausable {
         Voter storage voter = voters[voterAddress];
         voter.response = (_response == true ? Response.YES : Response.NO);
         voteCasters.push(voterAddress);
+
+        emit Vote(voterAddress, _response);
     }
 
+    /**
+     * @dev Get the votes that have been cast and return the yes alongside the no votes.
+     */
     function getVotes() public view returns (uint256, uint256) {
         uint256 yesCount = 0;
         uint256 noCount = 0;
@@ -112,11 +195,37 @@ contract Voting is Ownable, Pausable {
         return (noCount, yesCount);
     }
 
+    /**
+     * @dev Get all the registered voters and the voters who have casted the votes.
+     */
     function getUsers()
         public
         view
         returns (address[] memory, address[] memory)
     {
         return (registeredVoters, voteCasters);
+    }
+
+    /**
+     * @dev Reset the votes for the voting session.
+     */
+    function resetVotes() external whenPaused onlyOwner {
+        // Run rhrough all of the people who casted votes
+        for (uint256 i = 0; i < voteCasters.length; i++) {
+            // Get the current address we want to reset
+            address currentAddress = voteCasters[i];
+
+            // Get the previous name of the user so we can reset it
+            string memory currentVoterName = voters[currentAddress].name;
+
+            voters[currentAddress] = Voter(
+                currentVoterName,
+                Response.NO,
+                true,
+                false
+            );
+        }
+        // Delete all voters
+        delete voteCasters;
     }
 }

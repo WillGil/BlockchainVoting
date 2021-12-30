@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import './App.css';
 import contract from './contracts/Voting.json';
 import {Button} from '@material-ui/core'; 
-import { Alert, AlertTitle } from '@mui/material';
 
 
 //const contractAddress = "0x355638a4eCcb777794257f22f50c289d4189F245";
