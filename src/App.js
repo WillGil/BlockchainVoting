@@ -91,7 +91,7 @@ function App() {
       </div>
       <div>
         {currentAccount ? voteYesButton() : connectWalletButton()}
-        {currentAccount ? voteNoButton() : connectWalletButton()}
+        {currentAccount ? voteNoButton(): null}
       </div>
     </div>
   )
