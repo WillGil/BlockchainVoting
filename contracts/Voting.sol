@@ -74,13 +74,13 @@ contract Voting is Ownable, Pausable {
     }
 
     // Voter can be added to the smart contract (But only when it's not voting time)
-    function addVoter(string memory name)
+    function addVoter(string memory _name)
         external
         whenPaused
         NotRegisteredToVote
     {
         address newVoter = _msgSender();
-        voters[newVoter] = Voter(name, Response.NO, true, false);
+        voters[newVoter] = Voter(_name, Response.NO, true, false);
         // Add a new voter to the list of registered voters
         registeredVoters.push(newVoter);
     }

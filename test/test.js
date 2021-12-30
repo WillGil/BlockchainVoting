@@ -48,13 +48,14 @@ describe("Voting", function(){
 
     });
     it("Adding users when not paused.", async function () {
-      const unpause = await voting.startVote();
+      await voting.startVote();
+      
       const addedUserTx = voting.addVoter("Test");
       await expect(addedUserTx).to.be.revertedWith("Pausable: not paused"); 
 
     });
     it("Adding user who has already registered once, no double-voting.", async function () {
-      const addedUserTx = voting.addVoter("Test");
+      await voting.addVoter("Test");
       const secondUserTx = voting.addVoter("Test2");
 
       await expect(secondUserTx).to.be.revertedWith("Voting: You are already registered to vote"); 
@@ -63,12 +64,38 @@ describe("Voting", function(){
   });
   describe("Voting", function () {
 
-    it("User can vote.", async function(){
+    it("User can vote true.", async function(){
 
-      // Unpause the voting.
-      
-      const addedUser = await voting.addVoter("Test");
-      const voteTx = await voting.vote(true);
+      // Add user so they can vote
+      await voting.addVoter("James Lewis");
+
+      // Start the vote with the users already registered
+      await voting.startVote();
+      await voting.vote(true);
+
+      const [noCount, yesCount] = await voting.getVotes();
+
+      // Expect only one response of yes
+      expect(yesCount).to.equal(1);
+      expect(noCount).to.equal(0);
+
+
+    })
+    it("User can vote false.", async function(){
+
+      // Add user so they can vote
+      await voting.addVoter("James Lewis");
+
+      // Start the vote with the users already registered
+      await voting.startVote();
+      await voting.vote(false);
+
+      const [noCount, yesCount] = await voting.getVotes();
+
+      // Expect only one response of no
+      expect(yesCount).to.equal(0);
+      expect(noCount).to.equal(1);
+
     })
   });
 

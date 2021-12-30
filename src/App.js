@@ -1,25 +1,100 @@
-import logo from './logo.svg';
+import { useEffect, useState } from 'react';
 import './App.css';
+import contract from './contracts/Voting.json';
+import {Button} from '@material-ui/core'; 
+import { Alert, AlertTitle } from '@mui/material';
+
+
+//const contractAddress = "0x355638a4eCcb777794257f22f50c289d4189F245";
+const abi = contract.abi;
+
 
 function App() {
+
+  const [currentAccount, setCurrentAccount] = useState(null);
+
+
+  const checkWalletIsConnected = async () => { 
+    const {ethereum} = window;
+
+    if(!ethereum){
+      console.log("Make sure you have metamask installed.");
+      return;
+    } else{
+      console.log("Wallet exists, ready to go!");
+    }
+
+    //Request account from user
+    const accounts = await ethereum.request({method:"eth_requestAccounts"});
+
+    if(accounts.length !== 0){
+      const account = accounts[0];
+      console.log(`Found an account ${account}`);
+      // Set account state
+      setCurrentAccount(account);
+
+    } else{
+      console.log("No authorised account found!");
+    }
+   
+
+
+
+  }
+
+  const connectWalletHandler = () => { }
+
+  const yesVoteHandler = () => { 
+    console.log(`${currentAccount} voted yes.`);
+
+    
+  }
+
+  const noVoteHandler = () => { 
+    console.log(`${currentAccount} voted no.`);
+
+  }
+
+  const connectWalletButton = () => {
+    return (
+      <Button onClick={connectWalletHandler} >
+        Connect Wallet
+      </Button>
+    )
+  }
+
+  const voteYesButton = () => {
+    return (
+      <Button onClick={yesVoteHandler}>
+        Yes
+      </Button>
+    )
+  }
+
+  const voteNoButton =() =>{
+    return (
+      <Button onClick={noVoteHandler}>
+        No
+      </Button>
+    )
+  }
+
+  useEffect(() => {
+    checkWalletIsConnected();
+  }, [])
+  // Components can be programmatically injected in like below
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='main-app'>
+      <h1>Blockchain Voting</h1>
+      <div>
+        <p>is Curtis in bed?</p>
+      </div>
+      <div>
+        {currentAccount ? voteYesButton() : connectWalletButton()}
+        {currentAccount ? voteNoButton() : connectWalletButton()}
+      </div>
     </div>
-  );
+  )
 }
 
 export default App;
