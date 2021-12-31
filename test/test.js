@@ -9,6 +9,9 @@ let addr2;
 let addrs;
 
 
+const question = "Bean or Dean?";
+
+
 describe("Voting", function(){
   // `beforeEach` will run before each test, re-deploying the contract every
   // time. It receives a callback, which can be async.
@@ -20,7 +23,7 @@ describe("Voting", function(){
     // To deploy our contract, we just have to call Token.deploy() and await
     // for it to be deployed(), which happens once its transaction has been
     // mined.
-    voting = await Voting.deploy();
+    voting = await Voting.deploy(question);
   });
 
   describe("Setup", function () {
@@ -33,6 +36,14 @@ describe("Voting", function(){
 
       expect(usersRegistered.length).to.equal(0);
       expect(usersVoted.length).to.equal(0);
+    
+    });
+
+    it("Check that the question has been added correctly.", async function () {
+
+      const question = await voting.getQuestion();
+
+      expect(question).to.equal(question)
     
     });
   })

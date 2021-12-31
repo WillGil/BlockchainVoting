@@ -22,6 +22,11 @@ contract Voting is Ownable, Pausable {
     address[] public voteCasters;
 
     /**
+     * @dev this variable holds the question that we are going to ask the blockchain.
+     */
+    string public question;
+
+    /**
      * @dev a map that has a one to one realtionship between
      * addresses and voters.
      */
@@ -58,9 +63,12 @@ contract Voting is Ownable, Pausable {
     /**
      * @dev Initalises the code in the paused state, not ready for voting.
      */
-    constructor() {
+    constructor(string memory _question) {
         // pause voting until ready
         _pause();
+
+        // Set the question to be asked
+        question = _question;
     }
 
     /**
@@ -227,5 +235,12 @@ contract Voting is Ownable, Pausable {
         }
         // Delete all voters
         delete voteCasters;
+    }
+
+    /**
+     * @dev get the question that we are going to ask.
+     */
+    function getQuestion() public view returns (string memory) {
+        return question;
     }
 }

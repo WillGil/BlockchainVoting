@@ -77,21 +77,33 @@ function App() {
       </Button>
     )
   }
+  const loadQuestion = () =>{
+    // Chcck blockchain
+    try{
+
+      const {ethereum} = window;
+    }catch(err){
+         console.log(err);
+       }
+  }
 
   useEffect(() => {
     checkWalletIsConnected();
   }, [])
-  // Components can be programmatically injected in like below
+  // Components can be programmatically injected in like below, We could load question from contract (later)
   return (
     <div className='main-app'>
+      <div>
+        Connected as <i>{currentAccount}</i>
+      </div>
       <h1>Blockchain Voting</h1>
       <div>
         <p>is Curtis in bed?</p>
       </div>
       <div>
-        {currentAccount ? voteYesButton() : connectWalletButton()}
-        {currentAccount ? voteNoButton(): null}
+      {currentAccount ? loadQuestion() : connectWalletButton()}
       </div>
+      
     </div>
   )
 }
