@@ -97,6 +97,42 @@ describe("Voting", function(){
       expect(noCount).to.equal(1);
 
     })
+
+    it("Voting can be reset.", async function(){
+
+      // Add user so they can vote
+      await voting.addVoter("James Lewis");
+
+      // Start the vote with the users already registered
+      await voting.startVote();
+      await voting.vote(false);
+
+      let [noCount, yesCount] = await voting.getVotes();
+
+      // Expect only one response of no
+      expect(yesCount).to.equal(0);
+      expect(noCount).to.equal(1);
+
+      // End the vote
+      await voting.endVote();
+
+      // Reset the vote stats 
+      await voting.resetVotes();
+
+      // Get the number of people who have casted votes
+      const [registeredVoters, voteCasters] = await voting.getVotes();
+
+
+      // since everything on the BC is 0 unless otherwise set
+      expect(voteCasters).to.equal(0);
+    
+      // Get the amount of votes casted
+      [noCount, yesCount] = await voting.getVotes();
+      expect(yesCount).to.equal(0);
+      expect(noCount).to.equal(0);
+
+    })
   });
+
 
 });
