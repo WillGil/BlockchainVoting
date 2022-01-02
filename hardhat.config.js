@@ -1,4 +1,5 @@
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-ethers");
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
@@ -18,4 +19,19 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
  */
 module.exports = {
   solidity: "0.8.4",
+  // Add it to the src folder for website to access ABI
+  // paths: {
+  //   artifacts:'./src/artifacts'
+  // },
+
+
+  networks: {
+    hardhat: {
+      chainId:1337
+    },
+    ropsten:{
+      url:"https://ropsten.infura.io/v3/587f2c218ff040ebbeca03968c2620fa",
+      accounts: [`0x${process.env.ROPSTON_PK}`],
+    }
+  }
 };
