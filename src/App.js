@@ -6,7 +6,9 @@ import {ethers } from 'ethers'
 
 
 
-const contractAddress = "0x85AAB37161be03dB138dFEd914421Fc8Fa80d507";
+//const contractAddress = "0x85AAB37161be03dB138dFEd914421Fc8Fa80d507";
+const contractAddress = "0x6d05547cE44983E6b1c919a729C94188fd65621A";
+
 const abi = contract.abi;
 
 
@@ -49,7 +51,7 @@ function App() {
       const votingContract = new ethers.Contract(contractAddress,abi, signer);
 
       // Now get the question attached 
-      const question = await votingContract.getQuestion();
+      const question = await votingContract.question();
 
       setCurrentQuestion(question);
     }
@@ -64,11 +66,12 @@ function App() {
       const signer = provider.getSigner();
       const votingContract = new ethers.Contract(contractAddress,abi, signer);
       
+      const voters = await votingContract.getVotedUsers();
+      
+      /// We have the array now 
+      console.log(voters);
 
-      const address = await signer.getAddress();
-      const getVoters =  await votingContract.registeredVoters().then(resp =>{
-        console.log(getVoters);
-      })      
+   
    }
   }
 

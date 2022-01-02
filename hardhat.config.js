@@ -30,7 +30,7 @@ module.exports = {
       chainId:1337
     },
     ropsten:{
-      url: `${process.env.INFURA_URL}`,
+      url: "https://ropsten.infura.io/v3/587f2c218ff040ebbeca03968c2620fa",
       accounts: [`0x${process.env.ROPSTON_PK}`],
     }
   }
