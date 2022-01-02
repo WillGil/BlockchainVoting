@@ -56,6 +56,22 @@ function App() {
 
    }
 
+   const getIfUserHasRegistered = async ()=>{
+    const {ethereum} = window;
+
+    if(ethereum){
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const votingContract = new ethers.Contract(contractAddress,abi, signer);
+      
+
+      const address = await signer.getAddress();
+      const getVoters =  await votingContract.registeredVoters().then(resp =>{
+        console.log(getVoters);
+      })      
+   }
+  }
+
   // const connectWalletHandler = () => { }
 
   // const yesVoteHandler = () => { 
@@ -95,7 +111,8 @@ function App() {
 
   useEffect(() => {
     checkWalletIsConnected();
-    getQuestion()
+    getQuestion();
+    getIfUserHasRegistered();
   }, [])
 
 
@@ -107,7 +124,10 @@ function App() {
       </div>
       <h1>Blockchain Voting</h1>
       <div>
-          {currentQuestion}
+          {currentQuestion? currentQuestion: "Loading..."}
+      </div>
+      <div>
+
       </div>
     </div>
   )

@@ -238,9 +238,16 @@ contract Voting is Ownable, Pausable {
     }
 
     /**
-     * @dev get the question that we are going to ask.
+     * @dev create getter for registeredVoters (Referenced var)
      */
-    function getQuestion() public view returns (string memory) {
-        return question;
+    function getRegisteredVoters() public view returns (address[] memory) {
+        return registeredVoters;
+    }
+
+    /**
+     * @dev create getter for voteCasters (Referenced var)
+     */
+    function getVotedUsers() public view returns (address[] memory) {
+        return voteCasters;
     }
 }
