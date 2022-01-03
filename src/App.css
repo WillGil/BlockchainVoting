@@ -24,3 +24,8 @@
 .vote-no-button {
   background: lightcoral;
 }
+
+.mainbody {
+  padding: 10px;
+  margin: 10px;
+}

@@ -1,21 +1,47 @@
-import { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react'
+import NavBar from './components/NavBar'
+import Form from './components/Form'
 import './App.css';
-import contract from './contracts/Voting.json';
-import {Button} from '@material-ui/core'; 
 import {ethers } from 'ethers'
+import votingContract from './contracts/Voting.json';
 
 
 
-//const contractAddress = "0x85AAB37161be03dB138dFEd914421Fc8Fa80d507";
-const contractAddress = "0x6d05547cE44983E6b1c919a729C94188fd65621A";
-
-const abi = contract.abi;
-
-
-function App() {
-
+function App(){
+  // Set the required state
   const [currentAccount, setCurrentAccount] = useState(null);
-  const [currentQuestion, setCurrentQuestion] = useState("");
+  const [currentRegisteredUsers, setCurrentRegisteredUsers] = useState([]);
+  
+
+  // Set required contract information
+  const contractAddress = "0x6d05547cE44983E6b1c919a729C94188fd65621A";
+  const abi = votingContract.abi;
+
+
+  // When page is rendered we wanna grab the account
+  useEffect(()=>{
+    // We want to load the account, metamask stuff
+    checkWalletIsConnected();
+
+    // Get all the registered users 
+    getRegisteredUsers();
+
+  }, [])
+
+
+  const getRegisteredUsers = async () => {
+    const {ethereum} = window;
+
+    if(ethereum){
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(contractAddress, abi, signer);     
+      
+      const registeredUsers = await contract.getRegisteredVoters();
+
+      setCurrentRegisteredUsers(registeredUsers);
+    }
+  }
 
   const checkWalletIsConnected = async () => { 
     const {ethereum} = window;
@@ -30,7 +56,7 @@ function App() {
     //Request account from user
     const accounts = await ethereum.request({method:"eth_requestAccounts"});
 
-    if(accounts.length !== 0){
+    if(accounts.length !== 0) {
       const account = accounts[0];
       console.log(`Found an account ${account}`);
       // Set account state
@@ -42,98 +68,14 @@ function App() {
   
   }
 
-  const getQuestion = async() => {
-    const {ethereum} = window;
 
-    if(ethereum){
-      const provider = new ethers.providers.Web3Provider(ethereum);
-      const signer = provider.getSigner();
-      const votingContract = new ethers.Contract(contractAddress,abi, signer);
-
-      // Now get the question attached 
-      const question = await votingContract.question();
-
-      setCurrentQuestion(question);
-    }
-
-   }
-
-   const getIfUserHasRegistered = async ()=>{
-    const {ethereum} = window;
-
-    if(ethereum){
-      const provider = new ethers.providers.Web3Provider(ethereum);
-      const signer = provider.getSigner();
-      const votingContract = new ethers.Contract(contractAddress,abi, signer);
-      
-      const voters = await votingContract.getVotedUsers();
-      
-      /// We have the array now 
-      console.log(voters);
-
-   
-   }
-  }
-
-  // const connectWalletHandler = () => { }
-
-  // const yesVoteHandler = () => { 
-  //   console.log(`${currentAccount} voted yes.`);
-
-    
-  // }
-
-  // const noVoteHandler = () => { 
-  //   console.log(`${currentAccount} voted no.`);
-
-  // }
-
-  // const connectWalletButton = () => {
-  //   return (
-  //     <Button onClick={connectWalletHandler} >
-  //       Connect Wallet
-  //     </Button>
-  //   )
-  // }
-
-  // const voteYesButton = () => {
-  //   return (
-  //     <Button onClick={yesVoteHandler}>
-  //       Yes
-  //     </Button>
-  //   )
-  // }
-
-  // const voteNoButton =() =>{
-  //   return (
-  //     <Button onClick={noVoteHandler}>
-  //       No
-  //     </Button>
-  //   )
-  // }
-
-  useEffect(() => {
-    checkWalletIsConnected();
-    getQuestion();
-    getIfUserHasRegistered();
-  }, [])
-
-
-  // Components can be programmatically injected in like below, We could load question from contract (later)
   return (
-    <div className='main-app'>
-      <div>
-        <p>Connected as <i>{currentAccount}</i></p>
+    <>
+      <NavBar account={currentAccount}/>
+      <div className='mainbody'>
+          <Form/>
       </div>
-      <h1>Blockchain Voting</h1>
-      <div>
-          {currentQuestion? currentQuestion: "Loading..."}
-      </div>
-      <div>
-
-      </div>
-    </div>
+    </>
   )
 }
-
 export default App;
