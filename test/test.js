@@ -41,7 +41,7 @@ describe("Voting", function(){
 
     it("Check that the question has been added correctly.", async function () {
 
-      const question = await voting.getQuestion();
+      const question = await voting.question();
 
       expect(question).to.equal(question)
     
