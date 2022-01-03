@@ -2,6 +2,7 @@ import TextField from "@material-ui/core/TextField";
 import React, { useState } from "react";
 import { Button, Paper } from "@material-ui/core";
 
+
 const Register= (props) => {
   const [textValue, setTextValue] = useState("");
 
@@ -16,7 +17,7 @@ const Register= (props) => {
 
   return (
     <Paper>
-      <h2>Register</h2>
+      <h4>Register</h4>
 
       <TextField
         onChange={onTextChange}

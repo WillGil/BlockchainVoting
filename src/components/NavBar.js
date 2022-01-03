@@ -6,6 +6,11 @@ import Box from '@material-ui/core/Box';
 
 
 const NavBar = (props) => {
+
+    const displayAddressTruncated = function(){
+        return props.account.slice(0,5)+"...."+props.account.slice(-5)
+    }
+
     return(
         <div>
         <AppBar position="static">
@@ -15,7 +20,7 @@ const NavBar = (props) => {
                 Blockchain Voting
             </Typography>
             </Box>
-           {props.account ?`Connected to ${props.account}` : "Not Connected" } 
+           {props.account ?`Connected to ${displayAddressTruncated()}` : "Not Connected" } 
             </Toolbar>
         </AppBar>
         </div>

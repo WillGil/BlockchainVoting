@@ -75,10 +75,7 @@ function App(){
             {question?`QOTD: ${question}`: "Loading..."}
         </div>
         <div>
-        <h4>Interact</h4>
         {isRegisteredUser ? <Vote/>: <Register account={account} setIsRegisteredUser={setIsRegisteredUser}/>}
-
-
         </div>
 
         <div>
