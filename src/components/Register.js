@@ -2,11 +2,14 @@ import TextField from "@material-ui/core/TextField";
 import React, { useState } from "react";
 import { Button, Paper } from "@material-ui/core";
 
-const Form= () => {
+const Register= () => {
   const [textValue, setTextValue] = useState("");
 
   const onTextChange = (e) => setTextValue(e.target.value);
-  const handleSubmit = () => console.log(textValue);
+  const handleSubmit = () => {
+    console.log("Register started...");
+    
+  }
   const handleReset = () => setTextValue("");
 
   return (
@@ -16,7 +19,7 @@ const Form= () => {
       <TextField
         onChange={onTextChange}
         value={textValue}
-        label={"Name"} //optional
+        label={"Name of Voter..."} //optional
       />
 
       <Button onClick={handleSubmit}>Submit</Button>
@@ -25,4 +28,4 @@ const Form= () => {
   );
 };
 
-export default Form;
+export default Register;
