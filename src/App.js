@@ -102,7 +102,7 @@ function App(){
           if(isRegisteredUser){
             // Is voting paused?
             if(pausedVoting){
-              return(<h4>Voting is paused, please wait...</h4>)
+              return(<h3>Voting is paused, please wait...</h3>)
             } else{
               return (<Vote/>);
             }
