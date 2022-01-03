@@ -2,8 +2,11 @@ import React, { useEffect, useState } from 'react'
 import NavBar from './components/NavBar'
 import Register from './components/Register'
 import Vote from './components/Vote'
-import votingProviderContract from './Contract'
+import provider from './Provider'
 import './App.css';
+import votingContract from './contracts/Voting.json';
+import {ethers} from 'ethers'
+
 
 
 
@@ -13,8 +16,9 @@ function App(){
   const [question, setQuestion] = useState([]);
   const [registeredUsers, setRegsiteredUsers] = useState([]);
   const [isRegisteredUser, setIsRegisteredUser] = useState(false)
-
-
+  const [contract, setContract] =useState(undefined)
+  const [pausedVoting, setVotingPaused] =useState(undefined)
+    
   // When page is rendered we wanna grab the account only 
   useEffect(()=>{
     // We want to load the account, metamask stuff
@@ -31,36 +35,55 @@ function App(){
       }
   
       //Request account from user
-      const accounts = await ethereum.request({method:"eth_requestAccounts"});
+      await provider.send("eth_requestAccounts", []);
+      // Get user as a signer 
+      const signer = provider.getSigner();
+      console.log("Account:", await signer.getAddress());
   
-      if(accounts.length !== 0) {
-        console.log(`Found accounts ${accounts}`);
+      // Set required contract information
+      const contractAddress = "0x6d05547cE44983E6b1c919a729C94188fd65621A";
+      const abi = votingContract.abi;
 
-     
-        const question = await votingProviderContract.question();
+      // Get contract for specific signer
+      const contract = new ethers.Contract(contractAddress, abi, signer);     
 
-        const registeredUsers = await votingProviderContract.getRegisteredVoters();
+      const question = await contract.question();
 
-        // CHeck to se if user is registered
-        if(registeredUsers[accounts[0]] === undefined){
-          // User not registered
-          setIsRegisteredUser(false);
+      const registeredUsers = await contract.getRegisteredVoters();
 
-        } else{
-          setIsRegisteredUser(true);
-        }
-
- 
-        console.log(isRegisteredUser);
-
-        setRegsiteredUsers(registeredUsers);
-        setQuestion(question)
-        setAccount(accounts[0]);
   
-      } else{
-        console.log("No authorised account found!");
+      const signerAddress = await signer.getAddress();
+
+      const votingPaused = await contract.paused();
+
+      let foundAddress= false;
+
+      // Check to se if user is registered since it's an array we loop
+      for(let i=0;i<registeredUsers.length;i++){
+          if(registeredUsers[i] === signerAddress){
+            // Found value
+            foundAddress = true;
+          }
       }
 
+      if(foundAddress){
+        // User not registered
+        setIsRegisteredUser(true);
+
+      } else{
+        setIsRegisteredUser(false);
+      }
+
+
+      console.log(isRegisteredUser);
+
+      setRegsiteredUsers(registeredUsers);
+      setQuestion(question)
+      setAccount(signerAddress);
+      setContract(contract);
+      setVotingPaused(votingPaused)
+
+      
     }
     init();
   }, [isRegisteredUser])
@@ -75,12 +98,25 @@ function App(){
             {question?`QOTD: ${question}`: "Loading..."}
         </div>
         <div>
-        {isRegisteredUser ? <Vote/>: <Register account={account} setIsRegisteredUser={setIsRegisteredUser}/>}
-        </div>
+        {(() => {
+          if(isRegisteredUser){
+            // Is voting paused?
+            if(pausedVoting){
+              return(<h4>Voting is paused, please wait...</h4>)
+            } else{
+              return (<Vote/>);
+            }
 
-        <div>
-        <h4>Registered</h4>
-        {registeredUsers.length !== 0 ? registeredUsers: "No Users Registered..."}
+          } else{
+            // Not registered so give register component
+            return(<Register setIsRegisteredUser={setIsRegisteredUser} contract={contract}/>)
+          }
+        })()}
+        
+        </div>
+        <div className='withpre'>
+        <h4>Accounts Registered</h4>
+        {registeredUsers.length !== 0 ? registeredUsers.join("\n"): "No Users Registered..."}
         </div>
       </div>
     </>

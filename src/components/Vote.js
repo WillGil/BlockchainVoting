@@ -11,7 +11,8 @@ import {Button} from '@material-ui/core';
         console.log(`${props.currentAccount} voted no.`);
     }
       return(
-        <><Button onClick={yesVoteHandler}>
+        <>
+        <h4>Now it's time to vote...</h4><Button onClick={yesVoteHandler}>
               Yes
           </Button><Button onClick={noVoteHandler}>
                   No

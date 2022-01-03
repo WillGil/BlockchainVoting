@@ -41,3 +41,7 @@
   margin: 10px;
   padding: 10px;
 }
+
+.withpre {
+  white-space: pre;
+}
