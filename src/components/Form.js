@@ -11,7 +11,7 @@ const Form= () => {
 
   return (
     <Paper>
-      <h2>Register to vote</h2>
+      <h2>Register here</h2>
 
       <TextField
         onChange={onTextChange}

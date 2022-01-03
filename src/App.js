@@ -11,6 +11,7 @@ function App(){
   // Set the required state
   const [currentAccount, setCurrentAccount] = useState(null);
   const [currentRegisteredUsers, setCurrentRegisteredUsers] = useState([]);
+  const [isUserRegistered, setIsUserRegistered] = useState(false);
   
 
   // Set required contract information
@@ -68,12 +69,26 @@ function App(){
   
   }
 
+  const isUserApproved = function(){
+    const {ethereum} = window;
+
+    if(ethereum){
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+
+      if(currentRegisteredUsers[signer.getAddress()] === undefined){
+        return false;
+      }
+      return true;
+    }
+  }
 
   return (
     <>
       <NavBar account={currentAccount}/>
       <div className='mainbody'>
-          <Form/>
+
+        {isUserApproved() ? console.log("Approved") : <Form/>}
       </div>
     </>
   )
