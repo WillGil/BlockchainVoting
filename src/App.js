@@ -6,6 +6,7 @@ import provider from './Provider'
 import './App.css';
 import votingContract from './contracts/Voting.json';
 import {Contract} from 'ethers'
+import Owner from './components/Owner'
 
 
 
@@ -20,12 +21,13 @@ function App(){
   const [pausedVoting, setVotingPaused] =useState(true);
   const [isVotedUser, setIsVotedUser] = useState(false);
   const [votedUsers, setVotedUsers] = useState([]);
+
+  const ownerAddress = "0x30Bcf151fd651b1B4E3947dc2741e00a8196170F";
     
   // When page is rendered we wanna grab the account only 
   useEffect(()=>{
     // We want to load the account, metamask stuff
     const init = async () =>{
-      console.log("Rendering One");
       const {ethereum} = window;
 
 
@@ -99,7 +101,7 @@ function App(){
    setContract(contract)
   }
   init();
-  },[isVotedUser, isRegisteredUser, contract])
+  },[isVotedUser, isRegisteredUser, pausedVoting, votedUsers])
 
 
   function getContract() {
@@ -131,6 +133,14 @@ function App(){
       <NavBar account={account}/>
       <div className='mainbody'>
         <h1>Blockchain Voting</h1>
+        {(()=>{
+          // If the user is the owner then we do stuff
+          if(account === ownerAddress){
+            //Render owner panel
+            return(<Owner setVotingPaused={setVotingPaused} pausedVoting={pausedVoting} contract={contract} setVotedUsers={setVotedUsers}/>)
+          }
+
+        })()}
         <div>
             {question?`QOTD: ${question}`: "Loading..."}
         </div>

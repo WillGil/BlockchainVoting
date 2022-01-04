@@ -143,6 +143,22 @@ describe("Voting", function(){
       expect(noCount).to.equal(0);
 
     })
+    it("User cannot vote both ways", async function(){
+      // Add user so they can vote
+      await voting.addVoter("James Lewis");
+
+      // Start the vote with the users already registered
+      await voting.startVote();
+      await voting.vote(false);
+      await voting.vote(true);
+
+
+      let [noCount, yesCount] = await voting.getVotes();
+
+      expect(noCount).to.equal(1);
+      expect(yesCount).to.equal(0);
+      
+    })
   });
 
 
