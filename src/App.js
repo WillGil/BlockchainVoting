@@ -5,7 +5,7 @@ import Vote from './components/Vote'
 import provider from './Provider'
 import './App.css';
 import votingContract from './contracts/Voting.json';
-import {ethers} from 'ethers'
+import {Contract} from 'ethers'
 
 
 
@@ -15,16 +15,17 @@ function App(){
   const [account, setAccount] = useState([]);
   const [question, setQuestion] = useState([]);
   const [registeredUsers, setRegsiteredUsers] = useState([]);
-  const [isRegisteredUser, setIsRegisteredUser] = useState(false)
-  const [contract, setContract] =useState(undefined)
-  const [pausedVoting, setVotingPaused] =useState(true)
-  const [isVotedUser, setIsVotedUser] = useState(false)
+  const [isRegisteredUser, setIsRegisteredUser] = useState(false);
+  const [contract, setContract] =useState(undefined);
+  const [pausedVoting, setVotingPaused] =useState(true);
+  const [isVotedUser, setIsVotedUser] = useState(false);
+  const [votedUsers, setVotedUsers] = useState([]);
     
   // When page is rendered we wanna grab the account only 
   useEffect(()=>{
     // We want to load the account, metamask stuff
     const init = async () =>{
-      console.log("Rendering");
+      console.log("Rendering One");
       const {ethereum} = window;
 
 
@@ -37,47 +38,19 @@ function App(){
   
       //Request account from user
       await provider.send("eth_requestAccounts", []);
-      // Get user as a signer 
-      const signer = provider.getSigner();
-      console.log("Account:", await signer.getAddress());
-  
-      // Set required contract information
-      const contractAddress = "0x6d05547cE44983E6b1c919a729C94188fd65621A";
-      const abi = votingContract.abi;
-
-      // Get contract for specific signer
-      const contract = new ethers.Contract(contractAddress, abi, signer);     
+      
+      const { contract, signer } = getContract()   
+      
+      console.log("Address:",(await signer.getAddress()));
 
       const question = await contract.question();
 
-      const registeredUsers = await contract.getRegisteredVoters();
-      const votedUsers  = await contract.getVotedUsers();
-  
+    
       const signerAddress = await signer.getAddress();
 
       const votingPaused = await contract.paused();
 
-      // Check to se if user is registered since it's an array we loop
-     let foundAddressRegistered = checkIfContainedInList(registeredUsers, signerAddress)
-
-      if(foundAddressRegistered){
-        // User not registered
-        setIsRegisteredUser(true);
-
-      } else{
-        setIsRegisteredUser(false);
-      }
-
-      let foundAddressVoted = checkIfContainedInList(votedUsers, signerAddress);
-      
-      if(foundAddressVoted){
-        setIsVotedUser(true);
-      } else{
-        setIsVotedUser(false)
-      }
-
-
-      setRegsiteredUsers(registeredUsers);
+     
       setQuestion(question)
       setAccount(signerAddress);
       setContract(contract);
@@ -86,13 +59,62 @@ function App(){
       
     }
     init();
-  }, [isRegisteredUser, isVotedUser])
+  }, [])
 
 
 
   useEffect(()=>{
+    const init = async function(){
+
+    const { contract, signer } = getContract()    
+
+    const registeredUsers = await contract.getRegisteredVoters();
+    const votedUsers  = await contract.getVotedUsers();
+
+
+    const signerAddress = await signer.getAddress();
+
+
+    // Check to se if user is registered since it's an array we loop
+    let foundAddressRegistered = checkIfContainedInList(registeredUsers, signerAddress)
+
+    if(foundAddressRegistered){
+      // User not registered
+      setIsRegisteredUser(true);
+
+    } else{
+      setIsRegisteredUser(false);
+    }
+
+    let foundAddressVoted = checkIfContainedInList(votedUsers, signerAddress);
     
+    if(foundAddressVoted){
+      setIsVotedUser(true);
+    } else{
+      setIsVotedUser(false)
+    }
+
+   setRegsiteredUsers(registeredUsers);
+   setVotedUsers(votedUsers);
+   setContract(contract)
   }
+  init();
+  },[isVotedUser, isRegisteredUser, contract])
+
+
+  function getContract() {
+    const signer = provider.getSigner()
+
+    // Set required contract information
+    const contractAddress = "0x6d05547cE44983E6b1c919a729C94188fd65621A"
+    const abi = votingContract.abi
+
+    // Get contract for specific signer
+    const contract = new Contract(contractAddress, abi, signer)
+    return { contract, signer }
+  }
+
+
   function checkIfContainedInList(list, expected ) {
     let found = false;
     for (let i = 0; i < list.length; i++) {
@@ -132,6 +154,10 @@ function App(){
         <div className='withpre'>
         <h4>Accounts Registered</h4>
         {registeredUsers.length !== 0 ? registeredUsers.join("\n"): "No Users Registered..."}
+        </div>
+        <div className='withpre'>
+        <h4>Accounts Voted</h4>
+        {votedUsers.length !== 0 ? votedUsers.join("\n"): "No Users Voted..."}
         </div>
       </div>
     </>
