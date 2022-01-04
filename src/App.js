@@ -108,7 +108,10 @@ function App(){
     const signer = provider.getSigner()
 
     // Set required contract information
-    const contractAddress = "0x6d05547cE44983E6b1c919a729C94188fd65621A"
+    //OLD ADDRESS
+    //const contractAddress = "0x6d05547cE44983E6b1c919a729C94188fd65621A"
+    const contractAddress = "0xA12CF5a3970c819d69167C2ea2C920ebfcDe310A"
+
     const abi = votingContract.abi
 
     // Get contract for specific signer

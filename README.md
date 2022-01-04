@@ -1,15 +1,55 @@
-# Basic Sample Hardhat Project
+## Contents
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts.
+- Introduction
+- Installation
+- Testing
+- Compiling contracts
+- Running react site
 
-Try running some of the following tasks:
+## Introduction
 
-```shell
-npx hardhat accounts
-npx hardhat compile
-npx hardhat clean
+Developer: William Gilgunn
+
+This project is a proof-of-concept that voting can be undertaken on the blockchain using smart contracts.
+
+The project my first Dapp i've deployed and the first front-end i've written so it was mainly used as a learning experience for more interesting projects.
+
+## Installation
+
+To install the required dependencies for the project run
+
+```node
+npm install
+```
+
+## Testing
+
+Once you have the dependencies installed we can now run the tests which are in the file [test.js](test/test.js)
+
+The command to run them is as follows
+
+```node
 npx hardhat test
-npx hardhat node
-node scripts/sample-script.js
-npx hardhat help
+```
+
+## Compiling contracts
+
+To edit the smart contracts and recompile them run the command
+
+```node
+npx hardhat compile
+```
+
+## Running react site
+
+To run the react site run the command
+
+```node
+npm start
+```
+
+As this is a script to run the command below
+
+```node
+react-scripts start
 ```

@@ -52,8 +52,6 @@ import {Button} from '@material-ui/core';
             console.log(`Users have now been reset.`);
         }
 
-
-
     }
 
       return(
