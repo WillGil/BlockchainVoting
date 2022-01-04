@@ -56,8 +56,8 @@ contract Voting is Ownable, Pausable {
     struct Voter {
         string name;
         Response response;
-        bool init;
         bool castVote;
+        bool init;
     }
 
     /**
@@ -158,7 +158,7 @@ contract Voting is Ownable, Pausable {
         NotRegisteredToVote
     {
         address newVoter = _msgSender();
-        voters[newVoter] = Voter(_name, Response.NO, true, false);
+        voters[newVoter] = Voter(_name, Response.NO, false, true);
         // Add a new voter to the list of registered voters
         registeredVoters.push(newVoter);
 
@@ -182,6 +182,7 @@ contract Voting is Ownable, Pausable {
         //Update struct values
         Voter storage voter = voters[voterAddress];
         voter.response = (_response == true ? Response.YES : Response.NO);
+        voter.castVote = true;
         voteCasters.push(voterAddress);
 
         emit Vote(voterAddress, _response);

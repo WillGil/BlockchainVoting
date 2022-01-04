@@ -150,14 +150,14 @@ describe("Voting", function(){
       // Start the vote with the users already registered
       await voting.startVote();
       await voting.vote(false);
-      await voting.vote(true);
-
+      const secondVoteTx = voting.vote(true);
+      expect(secondVoteTx).to.be.revertedWith("Voting: You have casted your vote."); 
 
       let [noCount, yesCount] = await voting.getVotes();
 
       expect(noCount).to.equal(1);
       expect(yesCount).to.equal(0);
-      
+
     })
   });
 
