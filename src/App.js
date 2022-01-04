@@ -141,7 +141,7 @@ function App(){
             if(pausedVoting){
               return(<h3>Voting is paused, please wait...</h3>)
             } else{
-              return (<Vote/>);
+              return (<Vote setIsVotedUser={setIsVotedUser} contract={contract}/>);
             }
 
           } else{
