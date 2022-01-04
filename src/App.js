@@ -17,7 +17,8 @@ function App(){
   const [registeredUsers, setRegsiteredUsers] = useState([]);
   const [isRegisteredUser, setIsRegisteredUser] = useState(false)
   const [contract, setContract] =useState(undefined)
-  const [pausedVoting, setVotingPaused] =useState(undefined)
+  const [pausedVoting, setVotingPaused] =useState(true)
+  const [isVotedUser, setIsVotedUser] = useState(false)
     
   // When page is rendered we wanna grab the account only 
   useEffect(()=>{
@@ -50,23 +51,16 @@ function App(){
       const question = await contract.question();
 
       const registeredUsers = await contract.getRegisteredVoters();
-
+      const votedUsers  = await contract.getVotedUsers();
   
       const signerAddress = await signer.getAddress();
 
       const votingPaused = await contract.paused();
 
-      let foundAddress= false;
-
       // Check to se if user is registered since it's an array we loop
-      for(let i=0;i<registeredUsers.length;i++){
-          if(registeredUsers[i] === signerAddress){
-            // Found value
-            foundAddress = true;
-          }
-      }
+     let foundAddressRegistered = checkIfContainedInList(registeredUsers, signerAddress)
 
-      if(foundAddress){
+      if(foundAddressRegistered){
         // User not registered
         setIsRegisteredUser(true);
 
@@ -74,8 +68,14 @@ function App(){
         setIsRegisteredUser(false);
       }
 
+      let foundAddressVoted = checkIfContainedInList(votedUsers, signerAddress);
+      
+      if(foundAddressVoted){
+        setIsVotedUser(true);
+      } else{
+        setIsVotedUser(false)
+      }
 
-      console.log(isRegisteredUser);
 
       setRegsiteredUsers(registeredUsers);
       setQuestion(question)
@@ -86,8 +86,23 @@ function App(){
       
     }
     init();
-  }, [isRegisteredUser])
+  }, [isRegisteredUser, isVotedUser])
 
+
+
+  useEffect(()=>{
+    
+  }
+  function checkIfContainedInList(list, expected ) {
+    let found = false;
+    for (let i = 0; i < list.length; i++) {
+      if (list[i] === expected) {
+        // Found value
+        found = true
+      }
+    }
+    return found;
+  }
 
   return (
     <>
@@ -123,3 +138,5 @@ function App(){
   )
 }
 export default App;
+
+
